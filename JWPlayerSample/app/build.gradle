@@ -26,17 +26,19 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    compile 'com.android.support:customtabs:26.1.0'
+    implementation 'com.android.support:customtabs:26.1.0'
 
-    compile 'com.longtailvideo.jwplayer:jwplayer-core:+'
-    compile 'com.longtailvideo.jwplayer:jwplayer-common:+'
+    // JWPlayer SDK is currently supported up to 2.7.13 version.
+    // Later releases (2.8+) integrate Exoplayer v2 that currently conflicts with externally imported Exoplayer v2 required by Smart instream SDK.
+    implementation 'com.longtailvideo.jwplayer:jwplayer-core:2.7.+'
+    implementation 'com.longtailvideo.jwplayer:jwplayer-common:2.7.+'
 
-    compile 'com.google.android.exoplayer:exoplayer:2.6.0'
-    compile 'com.squareup.okhttp3:okhttp:3.6.0'
+    implementation 'com.google.android.exoplayer:exoplayer:2.6.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.6.0'
 
-    compile 'com.google.android.gms:play-services-ads:+'
-    compile 'com.google.android.gms:play-services-location:+'
+    implementation 'com.google.android.gms:play-services-ads:+'
+    implementation 'com.google.android.gms:play-services-location:+'
 
-    compile 'com.smartadserver.android:smart-core-sdk:1.0.0@aar'
-    compile 'com.smartadserver.android:smart-instream-sdk:1.0.0@aar'
+    implementation 'com.smartadserver.android:smart-core-sdk:1.1.0@aar'
+    implementation 'com.smartadserver.android:smart-instream-sdk:1.1.0@aar'
 }
