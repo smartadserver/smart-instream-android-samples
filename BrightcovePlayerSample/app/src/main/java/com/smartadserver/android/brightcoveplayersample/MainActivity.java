@@ -1,6 +1,8 @@
 package com.smartadserver.android.brightcoveplayersample;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -67,6 +69,21 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
         // Set label of SDK version label
         TextView sdkVersionTextview = findViewById(R.id.sdk_version_textview);
         sdkVersionTextview.setText("Smart Instream SDK v" + SVSLibraryInfo.getSharedInstance().getVersion());
+
+        /**
+         * GDPR Consent String manual setting.
+         *
+         * By uncommenting the following code, you will set the GDPR consent string manually.
+         * Note: the Smart Instream SDK will use retrieve the consent string from the SharedPreferences using the official IAB key "IABConsent_ConsentString".
+         * If using the SmartCMP SDK, you will not have to do this because the SmartCMP already stores the consent string
+         * using the official key.
+         * If you are using any other CMP that do not store the consent string in the SharedPreferences using the official
+         * IAB key, please store it yourself with the official key.
+         */
+        // SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
+        // editor.putString("IABConsent_ConsentString", "YourConsentString");
+        // editor.apply();
 
         /******************************************
          * now perform Player related code here.

@@ -1,8 +1,10 @@
 package com.smartadserver.android.androidtvsample;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,6 +81,21 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /**
+         * GDPR Consent String manual setting.
+         *
+         * By uncommenting the following code, you will set the GDPR consent string manually.
+         * Note: the Smart Instream SDK will use retrieve the consent string from the SharedPreferences using the official IAB key "IABConsent_ConsentString".
+         * If using the SmartCMP SDK, you will not have to do this because the SmartCMP already stores the consent string
+         * using the official key.
+         * If you are using any other CMP that do not store the consent string in the SharedPreferences using the official
+         * IAB key, please store it yourself with the official key.
+         */
+        // SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
+        // editor.putString("IABConsent_ConsentString", "YourConsentString");
+        // editor.apply();
 
         /******************************************
          * now perform Player related code here.

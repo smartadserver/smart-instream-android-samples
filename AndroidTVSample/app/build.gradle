@@ -35,7 +35,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:+'
     implementation 'com.google.android.gms:play-services-location:+'
 
-    implementation 'com.smartadserver.android:smart-core-sdk:1.1.0@aar'
-    implementation 'com.smartadserver.android:smart-instream-sdk:1.1.0@aar'
+    implementation 'com.smartadserver.android:smart-core-sdk:1.2@aar'
+    implementation 'com.smartadserver.android:smart-instream-sdk:1.2@aar'
 
 }
