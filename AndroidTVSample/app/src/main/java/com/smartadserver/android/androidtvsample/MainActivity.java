@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -236,7 +237,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
         // add a listener on ExoPlayer to detect when the video actually starts playing, to start the SVSAdManager
         getExoPlayer().addListener(new Player.EventListener() {
             @Override
-            public void onTimelineChanged(Timeline timeline, Object manifest) {}
+            public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {}
 
             @Override
             public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {}
@@ -364,7 +365,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     private SVSAdRule[] instantiateAdRules() {
         /***********************************************************************************
          * SVSAdRule objects allow an advanced management of your advertising policy.
-         * Please refer to the documentation for more indormation about these objects.
+         * Please refer to the documentation for more information about these objects.
          * This object is optional:
          * SVSAdManager will create its own if no SVSAdRule are passed upon initialization.
          ***********************************************************************************/

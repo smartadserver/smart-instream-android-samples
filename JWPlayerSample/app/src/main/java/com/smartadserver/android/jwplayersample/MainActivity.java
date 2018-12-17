@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     private SVSAdRule[] instantiateAdRules() {
         /***********************************************************************************
          * SVSAdRule objects allow an advanced management of your advertising policy.
-         * Please refer to the documentation for more indormation about these objects.
+         * Please refer to the documentation for more information about these objects.
          * This object is optional:
          * SVSAdManager will create its own if no SVSAdRule are passed upon initialization.
          ***********************************************************************************/
