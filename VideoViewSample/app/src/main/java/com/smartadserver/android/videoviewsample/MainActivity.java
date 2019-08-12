@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     // Constants
 
     // content video url
-    static final private String CONTENT_VIDEO_URL = "http://ns.sascdn.com/mobilesdk/samples/videos/BigBuckBunnyTrailer_360p.mp4";
+    static final private String CONTENT_VIDEO_URL = "https://ns.sascdn.com/mobilesdk/samples/videos/BigBuckBunnyTrailer_360p.mp4";
 
     // Smart Instream SDK placement parameters
     static final public int SITE_ID = 213040;

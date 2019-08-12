@@ -13,6 +13,6 @@ public class VideoViewSampleApplication extends Application {
         super.onCreate();
 
         // the configuration must be setup before making any ad call
-        SVSConfiguration.getSharedInstance().configureWithSiteId(this, MainActivity.SITE_ID);
+        SVSConfiguration.getSharedInstance().configure(this, MainActivity.SITE_ID);
     }
 }
