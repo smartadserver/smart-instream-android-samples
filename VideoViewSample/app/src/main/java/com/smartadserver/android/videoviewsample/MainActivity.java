@@ -1,5 +1,6 @@
 package com.smartadserver.android.videoviewsample;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -24,6 +25,7 @@ import com.smartadserver.android.instreamsdk.util.SVSLibraryInfo;
 /**
  * Simple activity that contains one an instance of {@link VideoView} as content player
  */
+@SuppressWarnings("DanglingJavadoc")
 public class MainActivity extends AppCompatActivity {
 
     // Constants
@@ -32,9 +34,9 @@ public class MainActivity extends AppCompatActivity {
     static final private String CONTENT_VIDEO_URL = "https://ns.sascdn.com/mobilesdk/samples/videos/BigBuckBunnyTrailer_360p.mp4";
 
     // Smart Instream SDK placement parameters
-    static final public int SITE_ID = 213040;
-    static final public int PAGE_ID = 901271;
-    static final public int FORMAT_ID = 29117;
+    static final public int SITE_ID = 205812;
+    static final public int PAGE_ID = 890742;
+    static final public int FORMAT_ID = 27153;
     static final public String TARGET = "";
 
     // Smart Instream SDK main ad manager class
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Performs Activity initialization after creation.
      */
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,18 +66,31 @@ public class MainActivity extends AppCompatActivity {
         sdkVersionTextview.setText("Smart Instream SDK v" + SVSLibraryInfo.getSharedInstance().getVersion());
 
         /**
-         * GDPR Consent String manual setting.
+         * TCF Consent String v2 manual setting.
          *
-         * By uncommenting the following code, you will set the GDPR consent string manually.
-         * Note: the Smart Instream SDK will use retrieve the consent string from the SharedPreferences using the official IAB key "IABConsent_ConsentString".
-         * If using the SmartCMP SDK, you will not have to do this because the SmartCMP already stores the consent string
-         * using the official key.
-         * If you are using any other CMP that do not store the consent string in the SharedPreferences using the official
+         * By uncommenting the following code, you will set the TCF consent string v2 manually.
+         * Note: the Smart Instream SDK will retrieve the TCF consent string from the SharedPreferences using the official IAB key "IABTCF_TCString".
+         *
+         * If you are using a CMP that does not store the consent string in the SharedPreferences using the official
          * IAB key, please store it yourself with the official key.
          */
         // SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         // SharedPreferences.Editor editor = prefs.edit();
-        // editor.putString("IABConsent_ConsentString", "YourConsentString");
+        // editor.putString("IABTCF_TCString", "YourTCFConsentString");
+        // editor.apply();
+
+        /**
+         * CCPA Consent String manual setting.
+         *
+         * By uncommenting the following code, you will set the CCPA consent string manually.
+         * Note: The Smart Instream SDK will retrieve the CCPA consent string from the SharedPreferences using the official IAB key "IABUSPrivacy_String".
+         *
+         * If you are using a CMP that does not store the consent string in the SharedPreferences using the official
+         * IAB key, please store it yourself with the official key.
+         */
+        // SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
+        // editor.putString("IABUSPrivacy_String", "YourCCPAConsentString");
         // editor.apply();
 
         /******************************************
@@ -129,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Configures the player. See https://developer.android.com/reference/android/widget/VideoView.html
      */
+    @SuppressWarnings("Convert2Lambda")
     private void configurePlayer() {
         mediaController = new MediaController(this);
         videoView.setMediaController(mediaController);
@@ -272,8 +289,7 @@ public class MainActivity extends AppCompatActivity {
          * SVSContentData provides information about your video content.
          * This object is optional.
          ****************************************************************/
-
-        SVSContentData contentData = new SVSContentData("contentID",
+        return new SVSContentData("contentID",
                 "contentTitle",
                 "videoContentType",
                 "videoContentCategory",
@@ -288,8 +304,6 @@ public class MainActivity extends AppCompatActivity {
                 new String[]{"tag1", "tag2"},
                 "externalContentID",
                 "videoCMSID");
-
-        return contentData;
     }
 
     /**
@@ -304,9 +318,7 @@ public class MainActivity extends AppCompatActivity {
          * the SVSContentPlayerPlugin interface. Here, we instantiate a ready-to-use SVSExoPlayerPlugin
          * for the ExoPlayer.
          ************************************************************************************************/
-        SVSVideoViewPlugin playerPlugin = new SVSVideoViewPlugin(videoView, mediaController, contentPlayerContainer, false);
-
-        return playerPlugin;
+        return new SVSVideoViewPlugin(videoView, mediaController, contentPlayerContainer, false);
     }
 
 }

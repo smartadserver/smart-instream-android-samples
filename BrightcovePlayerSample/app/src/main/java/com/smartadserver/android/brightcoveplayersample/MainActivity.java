@@ -1,5 +1,6 @@
 package com.smartadserver.android.brightcoveplayersample;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.preference.PreferenceManager;
@@ -33,6 +34,7 @@ import java.lang.reflect.Field;
 /**
  * Simple activity that contains one an instance of {@link BrightcoveExoPlayerVideoView} as content player
  */
+@SuppressWarnings({"SpellCheckingInspection", "DanglingJavadoc"})
 public class MainActivity extends AppCompatActivity implements SVSAdManager.UIInteractionListener {
 
     // Constants
@@ -41,9 +43,9 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     static final private String CONTENT_VIDEO_URL = "https://ns.sascdn.com/mobilesdk/samples/videos/BigBuckBunnyTrailer_360p.mp4";
 
     // Smart Instream SDK placement parameters
-    static final public int SITE_ID = 213040;
-    static final public int PAGE_ID = 901271;
-    static final public int FORMAT_ID = 29117;
+    static final public int SITE_ID = 205812;
+    static final public int PAGE_ID = 890742;
+    static final public int FORMAT_ID = 27153;
     static final public String TARGET = "";
 
     // Smart Instream SDK main ad manager class
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     /**
      * Performs Activity initialization after creation.
      */
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,18 +74,31 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
         sdkVersionTextview.setText("Smart Instream SDK v" + SVSLibraryInfo.getSharedInstance().getVersion());
 
         /**
-         * GDPR Consent String manual setting.
+         * TCF Consent String v2 manual setting.
          *
-         * By uncommenting the following code, you will set the GDPR consent string manually.
-         * Note: the Smart Instream SDK will use retrieve the consent string from the SharedPreferences using the official IAB key "IABConsent_ConsentString".
-         * If using the SmartCMP SDK, you will not have to do this because the SmartCMP already stores the consent string
-         * using the official key.
-         * If you are using any other CMP that do not store the consent string in the SharedPreferences using the official
+         * By uncommenting the following code, you will set the TCF consent string v2 manually.
+         * Note: the Smart Instream SDK will retrieve the TCF consent string from the SharedPreferences using the official IAB key "IABTCF_TCString".
+         *
+         * If you are using a CMP that does not store the consent string in the SharedPreferences using the official
          * IAB key, please store it yourself with the official key.
          */
         // SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         // SharedPreferences.Editor editor = prefs.edit();
-        // editor.putString("IABConsent_ConsentString", "YourConsentString");
+        // editor.putString("IABTCF_TCString", "YourTCFConsentString");
+        // editor.apply();
+
+        /**
+         * CCPA Consent String manual setting.
+         *
+         * By uncommenting the following code, you will set the CCPA consent string manually.
+         * Note: The Smart Instream SDK will retrieve the CCPA consent string from the SharedPreferences using the official IAB key "IABUSPrivacy_String".
+         *
+         * If you are using a CMP that does not store the consent string in the SharedPreferences using the official
+         * IAB key, please store it yourself with the official key.
+         */
+        // SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
+        // editor.putString("IABUSPrivacy_String", "YourCCPAConsentString");
         // editor.apply();
 
         /******************************************
@@ -150,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
      * Configures the player. See https://support.brightcove.com/overview-brightcove-player-sdk-android
      * documentation for further implementation.
      */
+    @SuppressWarnings("Convert2Lambda")
     private void configurePlayer() {
         EventEmitter eventEmitter = brightcoveExoPlayerVideoView.getEventEmitter();
         EventListener eventListener = new EventListener() {
@@ -309,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
          * This object is optional.
          ****************************************************************/
 
-        SVSContentData contentData = new SVSContentData("contentID",
+        return new SVSContentData("contentID",
                 "contentTitle",
                 "videoContentType",
                 "videoContentCategory",
@@ -324,8 +341,6 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
                 new String[]{"tag1", "tag2"},
                 "externalContentID",
                 "videoCMSID");
-
-        return contentData;
     }
 
     /**
@@ -340,9 +355,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
          * To be able to start the SVSAdManager, you need to create a content player plugin,
          * conforming to the SVSContentPlayerPlugin interface.
          ************************************************************************************************/
-        SVSBrightcovePlayerPlugin playerPlugin = new SVSBrightcovePlayerPlugin(brightcoveExoPlayerVideoView, contentPlayerContainer, false);
-
-        return playerPlugin;
+        return new SVSBrightcovePlayerPlugin(brightcoveExoPlayerVideoView, contentPlayerContainer, false);
     }
 
 
@@ -408,23 +421,20 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
      * Workaround method to disable the show/hide animation and avoid making the ActionBar flicker.
      */
     public static void disableShowHideAnimation(ActionBar actionBar) {
-        try
-        {
+        try {
             actionBar.getClass().getDeclaredMethod("setShowHideAnimationEnabled", boolean.class).invoke(actionBar, false);
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             try {
                 Field mActionBarField = actionBar.getClass().getSuperclass().getDeclaredField("mActionBar");
                 mActionBarField.setAccessible(true);
                 Object icsActionBar = mActionBarField.get(actionBar);
                 Field mShowHideAnimationEnabledField = icsActionBar.getClass().getDeclaredField("mShowHideAnimationEnabled");
                 mShowHideAnimationEnabledField.setAccessible(true);
-                mShowHideAnimationEnabledField.set(icsActionBar,false);
+                mShowHideAnimationEnabledField.set(icsActionBar, false);
                 Field mCurrentShowAnimField = icsActionBar.getClass().getDeclaredField("mCurrentShowAnim");
                 mCurrentShowAnimField.setAccessible(true);
-                mCurrentShowAnimField.set(icsActionBar,null);
-            }catch (Exception e){
+                mCurrentShowAnimField.set(icsActionBar, null);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

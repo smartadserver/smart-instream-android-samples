@@ -2,6 +2,12 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     defaultConfig {
         applicationId "com.smartadserver.android.exoplayersample"
         minSdkVersion 18
@@ -29,13 +35,13 @@ dependencies {
 
     implementation 'com.android.support:customtabs:28.0.0'
 
-    // Exoplayer SDK is currently supported up to latest 2.8.3 version.
-    implementation 'com.google.android.exoplayer:exoplayer:2.8.3'
+    // Exoplayer SDK is currently supported from 2.9.3 version.
+    implementation 'com.google.android.exoplayer:exoplayer:2.9.3'
     implementation 'com.squareup.okhttp3:okhttp:3.12.0'
 
     implementation 'com.google.android.gms:play-services-ads-identifier:16.0.0'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
 
-    implementation 'com.smartadserver.android:smart-core-sdk:7.1.1@aar'
-    implementation 'com.smartadserver.android:smart-instream-sdk:7.0.1@aar'
+    implementation 'com.smartadserver.android:smart-core-sdk:7.5.0@aar'
+    implementation 'com.smartadserver.android:smart-instream-sdk:7.5.0@aar'
 }

@@ -22,12 +22,12 @@ import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.RandomTrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -43,9 +43,10 @@ import com.smartadserver.android.instreamsdk.plugin.SVSExoPlayerPlugin;
 
 /**
  * Simple activity that contains one an instance of {@link com.google.android.exoplayer2.ExoPlayer} as content player
- *
+ * <p>
  * This sample can be use both on AndroidTV and Amazon FireTV.
  */
+@SuppressWarnings({"DanglingJavadoc", "SpellCheckingInspection"})
 public class MainActivity extends Activity implements SVSAdManager.UIInteractionListener {
 
     // Constants
@@ -54,9 +55,9 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     static final private String CONTENT_VIDEO_URL = "https://ns.sascdn.com/mobilesdk/samples/videos/BigBuckBunnyTrailer_360p.mp4";
 
     // Smart Instream SDK placement parameters
-    static final public int SITE_ID = 213040;
-    static final public int PAGE_ID = 901271;
-    static final public int FORMAT_ID = 29117;
+    static final public int SITE_ID = 205812;
+    static final public int PAGE_ID = 890742;
+    static final public int FORMAT_ID = 27153;
     static final public String TARGET = "";
 
     // Smart Instream SDK main ad manager class
@@ -72,7 +73,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
 
     // ExoPlayer related properties
     private DefaultBandwidthMeter defaultBandwidthMeter;
-    private SimpleExoPlayerView simpleExoPlayerView;
+    private PlayerView simpleExoPlayerView;
     private SimpleExoPlayer simpleExoPlayer;
 
     /**
@@ -84,18 +85,31 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
         setContentView(R.layout.activity_main);
 
         /**
-         * GDPR Consent String manual setting.
+         * TCF Consent String v2 manual setting.
          *
-         * By uncommenting the following code, you will set the GDPR consent string manually.
-         * Note: the Smart Instream SDK will use retrieve the consent string from the SharedPreferences using the official IAB key "IABConsent_ConsentString".
-         * If using the SmartCMP SDK, you will not have to do this because the SmartCMP already stores the consent string
-         * using the official key.
-         * If you are using any other CMP that do not store the consent string in the SharedPreferences using the official
+         * By uncommenting the following code, you will set the TCF consent string v2 manually.
+         * Note: the Smart Instream SDK will retrieve the TCF consent string from the SharedPreferences using the official IAB key "IABTCF_TCString".
+         *
+         * If you are using a CMP that does not store the consent string in the SharedPreferences using the official
          * IAB key, please store it yourself with the official key.
          */
         // SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         // SharedPreferences.Editor editor = prefs.edit();
-        // editor.putString("IABConsent_ConsentString", "YourConsentString");
+        // editor.putString("IABTCF_TCString", "YourTCFConsentString");
+        // editor.apply();
+
+        /**
+         * CCPA Consent String manual setting.
+         *
+         * By uncommenting the following code, you will set the CCPA consent string manually.
+         * Note: The Smart Instream SDK will retrieve the CCPA consent string from the SharedPreferences using the official IAB key "IABUSPrivacy_String".
+         *
+         * If you are using a CMP that does not store the consent string in the SharedPreferences using the official
+         * IAB key, please store it yourself with the official key.
+         */
+        // SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // SharedPreferences.Editor editor = prefs.edit();
+        // editor.putString("IABUSPrivacy_String", "YourCCPAConsentString");
         // editor.apply();
 
         /******************************************
@@ -144,9 +158,6 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
 
     /**
      * Detects remote button event to show controls.
-     * @param keyCode
-     * @param event
-     * @return
      */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -211,6 +222,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     /**
      * Bind all views to their related properties.
      */
+    @SuppressWarnings("Convert2Lambda")
     private void bindViews() {
         simpleExoPlayerView = findViewById(R.id.simple_exo_player_view);
         simpleExoPlayerView.setControllerAutoShow(false);
@@ -237,13 +249,16 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
         // add a listener on ExoPlayer to detect when the video actually starts playing, to start the SVSAdManager
         getExoPlayer().addListener(new Player.EventListener() {
             @Override
-            public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {}
+            public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
+            }
 
             @Override
-            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {}
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+            }
 
             @Override
-            public void onLoadingChanged(boolean isLoading) {}
+            public void onLoadingChanged(boolean isLoading) {
+            }
 
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
@@ -254,22 +269,28 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
             }
 
             @Override
-            public void onRepeatModeChanged(int repeatMode) {}
+            public void onRepeatModeChanged(int repeatMode) {
+            }
 
             @Override
-            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {}
+            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+            }
 
             @Override
-            public void onPlayerError(ExoPlaybackException error) {}
+            public void onPlayerError(ExoPlaybackException error) {
+            }
 
             @Override
-            public void onPositionDiscontinuity(int reason) {}
+            public void onPositionDiscontinuity(int reason) {
+            }
 
             @Override
-            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {}
+            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+            }
 
             @Override
-            public void onSeekProcessed() {}
+            public void onSeekProcessed() {
+            }
         });
 
         // initialize video source
@@ -278,7 +299,9 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
         Uri videoUri = Uri.parse(CONTENT_VIDEO_URL);
-        MediaSource mediaSource = new ExtractorMediaSource(videoUri, dataSourceFactory, extractorsFactory, null, null);
+        ExtractorMediaSource.Factory factory = new ExtractorMediaSource.Factory(dataSourceFactory);
+        factory.setExtractorsFactory(extractorsFactory);
+        MediaSource mediaSource = factory.createMediaSource(videoUri);
 
 
         // set media source on ExoPLayer
@@ -392,11 +415,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
          * This object is optional:
          * SVSAdManager will create its own if no SVSAdPlayerConfiguration is passed upon initialization.
          *************************************************************************************************/
-
-        // Create a new SVSAdPlayerConfiguration.
-        SVSAdPlayerConfiguration adPlayerConfiguration = new SVSAdPlayerConfiguration();
-
-        return adPlayerConfiguration;
+        return new SVSAdPlayerConfiguration();
     }
 
     /**
@@ -407,8 +426,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
          * SVSContentData provides information about your video content.
          * This object is optional.
          ****************************************************************/
-
-        SVSContentData contentData = new SVSContentData("contentID",
+        return new SVSContentData("contentID",
                 "contentTitle",
                 "videoContentType",
                 "videoContentCategory",
@@ -423,8 +441,6 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
                 new String[]{"tag1", "tag2"},
                 "externalContentID",
                 "videoCMSID");
-
-        return contentData;
     }
 
     /**
@@ -439,7 +455,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
          * the SVSContentPlayerPlugin interface. Here, we instantiate a ready-to-use SVSExoPlayerPlugin
          * for the ExoPlayer.
          ************************************************************************************************/
-        SVSExoPlayerPlugin playerPlugin = new SVSExoPlayerPlugin(simpleExoPlayer, simpleExoPlayerView, contentPlayerContainer, false) {
+        return new SVSExoPlayerPlugin(simpleExoPlayer, simpleExoPlayerView, contentPlayerContainer, false) {
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // We override those specific methods to know when the adBreaks start and stop, to disable remote button events.
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -456,8 +472,6 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
                 adBreakStarted = false;
             }
         };
-
-        return playerPlugin;
     }
 
     /**
@@ -475,9 +489,8 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
      */
     private SimpleExoPlayer getExoPlayer() {
         if (simpleExoPlayer == null) {
-            TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(getDefaultBandwidthMeter());
-            TrackSelector trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-
+            TrackSelection.Factory trackSelection = new RandomTrackSelection.Factory();
+            TrackSelector trackSelector = new DefaultTrackSelector(trackSelection);
             simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
         }
         return simpleExoPlayer;
