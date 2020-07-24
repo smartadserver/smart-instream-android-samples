@@ -361,21 +361,28 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
          * SVSContentData provides information about your video content.
          * This object is optional.
          ****************************************************************/
-        return new SVSContentData("contentID",
-                "contentTitle",
-                "videoContentType",
-                "videoContentCategory",
-                60,
-                1,
-                2,
-                "videoContentRating",
-                "contentProviderID",
-                "contentProviderName",
-                "videoContainerDistributorID",
-                "videoContainerDistributorName",
-                new String[]{"tag1", "tag2"},
-                "externalContentID",
-                "videoCMSID");
+        // Instantiate the builder.
+        SVSContentData.Builder builder = new SVSContentData.Builder();
+
+        // Sets your parameters.
+        builder.setContentID("contentID");
+        builder.setContentTitle("contentTitle");
+        builder.setVideoContentType("videoContentType");
+        builder.setVideoContentCategory("videoContentCategory");
+        builder.setVideoContentDuration(60);
+        builder.setVideoSeasonNumber(1);
+        builder.setVideoEpisodeNumber(2);
+        builder.setVideoContentRating("videoContentRating");
+        builder.setContentProviderID("contentProviderID");
+        builder.setContentProviderName("contentProviderName");
+        builder.setVideoContentDistributorID("videoContainerDistributorID");
+        builder.setVideoContentDistributorName("videoContainerDistributerName");
+        builder.setVideoContentTags(new String[]{"tag1", "tag2"});
+        builder.setExternalContentID("externalContentID");
+        builder.setVideoCMSID("videoCMSID");
+
+        // Then build your instance of SVSContentData
+        return builder.build();
     }
 
     /**
