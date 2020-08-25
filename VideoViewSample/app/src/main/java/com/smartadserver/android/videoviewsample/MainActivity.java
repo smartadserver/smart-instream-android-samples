@@ -1,11 +1,10 @@
 package com.smartadserver.android.videoviewsample;
 
 import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.MediaController;
