@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 
+import java.util.concurrent.Callable;
+
 /**
  * Implementation of the {@link SVSContentPlayerPlugin} interface for Exo player.
  * Source : https://github.com/smartadserver/smart-instream-android-plugins/
@@ -15,6 +17,7 @@ import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 public class SVSExoPlayerPlugin implements SVSContentPlayerPlugin {
 
     private Handler mainHandler;
+    private Handler exoPlayerHandler;
     private ViewGroup contentPlayerContainer;
     private ExoPlayer exoPlayer;
     private View exoPlayerView;
@@ -28,6 +31,9 @@ public class SVSExoPlayerPlugin implements SVSContentPlayerPlugin {
      */
     public SVSExoPlayerPlugin(ExoPlayer exoPlayer, View exoPlayerView, ViewGroup contentPlayerContainer, boolean isLiveContent) {
         this.mainHandler = new Handler(Looper.getMainLooper());
+        // create another handler for exoplayer related code only if exoplayer was not created in the main thread
+        this.exoPlayerHandler = exoPlayer.getApplicationLooper() == Looper.getMainLooper() ?
+                mainHandler : new Handler(exoPlayer.getApplicationLooper());
         this.exoPlayer = exoPlayer;
         this.exoPlayerView = exoPlayerView;
         this.contentPlayerContainer = contentPlayerContainer;
@@ -40,13 +46,9 @@ public class SVSExoPlayerPlugin implements SVSContentPlayerPlugin {
      */
     @Override
     public void adBreakEnded() {
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                exoPlayerView.setVisibility(View.VISIBLE); //make sure that exoPlayer is visible
-                exoPlayer.setPlayWhenReady(true);
-            }
-        });
+        //make sure that exoPlayer is visible
+        mainHandler.post(() -> exoPlayerView.setVisibility(View.VISIBLE));
+        exoPlayerHandler.post(() -> exoPlayer.setPlayWhenReady(true));
     }
 
     /**
@@ -55,13 +57,9 @@ public class SVSExoPlayerPlugin implements SVSContentPlayerPlugin {
      */
     @Override
     public void adBreakStarted() {
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                exoPlayer.setPlayWhenReady(false);
-                exoPlayerView.setVisibility(View.INVISIBLE);
-            }
-        });
+        exoPlayerHandler.post(() -> exoPlayer.setPlayWhenReady(false));
+        //make sure that exoPlayer is hidden
+        mainHandler.post(() -> exoPlayerView.setVisibility(View.INVISIBLE));
     }
 
     /**
@@ -69,7 +67,7 @@ public class SVSExoPlayerPlugin implements SVSContentPlayerPlugin {
      */
     @Override
     public boolean isPlaying() {
-        return exoPlayer.getPlayWhenReady();
+        return callOnExoplayerThreadAndWaitForResult(() -> exoPlayer.getPlayWhenReady());
     }
 
     /**
@@ -77,7 +75,7 @@ public class SVSExoPlayerPlugin implements SVSContentPlayerPlugin {
      */
     @Override
     public long getContentDuration() {
-        return isLiveContent ? -1 : exoPlayer.getDuration();
+        return isLiveContent ? -1 : callOnExoplayerThreadAndWaitForResult(() -> exoPlayer.getDuration());
     }
 
     /**
@@ -85,7 +83,7 @@ public class SVSExoPlayerPlugin implements SVSContentPlayerPlugin {
      */
     @Override
     public long getCurrentPosition() {
-        return exoPlayer.getCurrentPosition();
+        return callOnExoplayerThreadAndWaitForResult(() -> exoPlayer.getCurrentPosition());
     }
 
     /**
@@ -94,5 +92,46 @@ public class SVSExoPlayerPlugin implements SVSContentPlayerPlugin {
     @Override
     public ViewGroup getContentPlayerContainer() {
         return contentPlayerContainer;
+    }
+
+    /**
+     * Utility method to synchronously execute a {@link Callable task} on this plugin's ExoPlayer thread
+     * and get the result
+     * @param callable a {@link Callable} that returns a result
+     * @param <V> the type of the callable result
+     * @return the result
+     */
+    private <V> V callOnExoplayerThreadAndWaitForResult(Callable<V> callable) {
+
+        Object[] holder = new Object[1];
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    holder[0] = callable.call();
+                } catch (Exception e) {
+                }
+                synchronized (this) {
+                    this.notify();
+                }
+            }
+        };
+
+        // check if current looper is exoplayer looper, to run directly
+        if (Looper.myLooper() == exoPlayerHandler.getLooper()) {
+            r.run();
+        } else {
+            synchronized (r) {
+                exoPlayerHandler.post(r);
+                try {
+                    r.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return (V)holder[0];
+
     }
 }
