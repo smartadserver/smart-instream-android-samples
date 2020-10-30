@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId "com.smartadserver.android.jwplayersample"
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 110
         versionName "1.1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -48,6 +48,6 @@ dependencies {
     implementation 'androidx.browser:browser:1.0.0'
 
 
-    implementation 'com.smartadserver.android:smart-core-sdk:7.7.0@aar'
+    implementation 'com.smartadserver.android:smart-core-sdk:7.7.1@aar'
     implementation 'com.smartadserver.android:smart-instream-sdk:7.7.1@aar'
 }
