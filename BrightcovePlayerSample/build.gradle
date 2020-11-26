@@ -7,7 +7,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
+        classpath 'com.android.tools.build:gradle:4.1.1'
         
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -18,12 +18,17 @@ buildscript {
 allprojects {
     repositories {
         google()
-        maven { url 'http://repo.brightcove.com/releases' }
-        maven { url 'https://packagecloud.io/smartadserver/android/maven2' }
         jcenter()
-        flatDir {
-            dirs 'libs'
-        }
+
+        // Brightcove repository
+        maven { url 'http://repo.brightcove.com/releases' }
+
+        // Smart AdServer repository
+        maven { url 'https://packagecloud.io/smartadserver/android/maven2' }
+
+        // Huawei services dependencies repository
+        maven { url 'http://developer.huawei.com/repo/' }
+        
     }
 }
 

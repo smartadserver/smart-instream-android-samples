@@ -12,9 +12,10 @@ android {
         applicationId "com.smartadserver.android.jwplayersample"
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 110
-        versionName "1.1.0"
+        versionCode 111
+        versionName "1.1.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -37,17 +38,6 @@ dependencies {
     implementation 'com.longtailvideo.jwplayer:jwplayer-core:2.7.+'
     implementation 'com.longtailvideo.jwplayer:jwplayer-common:2.7.+'
 
-    // Exoplayer SDK is currently supported from 2.9.3 version.
-    implementation 'com.google.android.exoplayer:exoplayer:2.9.3'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
-
-    implementation 'com.google.android.gms:play-services-ads-identifier:17.0.0'
-    implementation 'com.google.android.gms:play-services-location:17.0.0'
-
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.browser:browser:1.0.0'
-
-
-    implementation 'com.smartadserver.android:smart-core-sdk:7.7.1@aar'
-    implementation 'com.smartadserver.android:smart-instream-sdk:7.7.1@aar'
+    // Import Smart Instream SDK
+    implementation 'com.smartadserver.android:smart-instream-sdk:7.7.2'
 }

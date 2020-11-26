@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -21,14 +21,9 @@ import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.RandomTrackSelection;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
@@ -71,8 +66,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     private boolean adBreakStarted = false;
 
     // ExoPlayer related properties
-    private DefaultBandwidthMeter defaultBandwidthMeter;
-    private PlayerView simpleExoPlayerView;
+    private PlayerView exoPlayerView;
     private SimpleExoPlayer simpleExoPlayer;
 
     /**
@@ -118,7 +112,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
         createAdManager();
         configurePlayer();
 
-        simpleExoPlayerView.showController();
+        exoPlayerView.showController();
     }
 
     /**
@@ -177,16 +171,16 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
             case KeyEvent.KEYCODE_DPAD_DOWN:
             case KeyEvent.KEYCODE_DPAD_RIGHT:
             case KeyEvent.KEYCODE_DPAD_UP:
-                if (!simpleExoPlayerView.getUseController()) {
-                    simpleExoPlayerView.setUseController(true);
+                if (!exoPlayerView.getUseController()) {
+                    exoPlayerView.setUseController(true);
                 }
-                simpleExoPlayerView.showController();
+                exoPlayerView.showController();
                 break;
 
             case KeyEvent.KEYCODE_BACK:
-                if (simpleExoPlayerView.getUseController()) {
+                if (exoPlayerView.getUseController()) {
                     // back button either hides the controls
-                    simpleExoPlayerView.setUseController(false);
+                    exoPlayerView.setUseController(false);
                 } else {
                     // or quits the application if controls are already hidden.
                     finishAffinity();
@@ -223,8 +217,8 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
      */
     @SuppressWarnings("Convert2Lambda")
     private void bindViews() {
-        simpleExoPlayerView = findViewById(R.id.simple_exo_player_view);
-        simpleExoPlayerView.setControllerAutoShow(false);
+        exoPlayerView = findViewById(R.id.exo_player_view);
+        exoPlayerView.setControllerAutoShow(false);
         contentPlayerContainer = findViewById(R.id.content_player_container);
 
         // add listener on replay button
@@ -243,7 +237,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     private void configurePlayer() {
 
         // connect the ExoPlayer view with the player instance
-        simpleExoPlayerView.setPlayer(getExoPlayer());
+        exoPlayerView.setPlayer(getExoPlayer());
 
         // add a listener on ExoPlayer to detect when the video actually starts playing, to start the SVSAdManager
         getExoPlayer().addListener(new Player.EventListener() {
@@ -292,22 +286,14 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
             }
         });
 
-        // initialize video source
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, getString(R.string.app_name)),
-                getDefaultBandwidthMeter());
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-
         Uri videoUri = Uri.parse(CONTENT_VIDEO_URL);
-        ExtractorMediaSource.Factory factory = new ExtractorMediaSource.Factory(dataSourceFactory);
-        factory.setExtractorsFactory(extractorsFactory);
-        MediaSource mediaSource = factory.createMediaSource(videoUri);
-
 
         // set media source on ExoPLayer
-        getExoPlayer().prepare(mediaSource);
+        getExoPlayer().setMediaItem(MediaItem.fromUri(videoUri));
+        getExoPlayer().prepare();
 
-        // start ExPlayer once prepared
-        getExoPlayer().setPlayWhenReady(true);
+        // do not start ExPlayer once prepared, the ad manager will take care of it
+        getExoPlayer().setPlayWhenReady(false);
     }
 
     /**
@@ -461,7 +447,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
          * the SVSContentPlayerPlugin interface. Here, we instantiate a ready-to-use SVSExoPlayerPlugin
          * for the ExoPlayer.
          ************************************************************************************************/
-        return new SVSExoPlayerPlugin(simpleExoPlayer, simpleExoPlayerView, contentPlayerContainer, false) {
+        return new SVSExoPlayerPlugin(simpleExoPlayer, exoPlayerView, contentPlayerContainer, false) {
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // We override those specific methods to know when the adBreaks start and stop, to disable remote button events.
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -481,23 +467,11 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     }
 
     /**
-     * Lazy loaded defaultBandwidthMeter getter.
-     */
-    protected DefaultBandwidthMeter getDefaultBandwidthMeter() {
-        if (defaultBandwidthMeter == null) {
-            defaultBandwidthMeter = new DefaultBandwidthMeter();
-        }
-        return defaultBandwidthMeter;
-    }
-
-    /**
      * Lazy loaded exoPlayer instance getter.
      */
     private SimpleExoPlayer getExoPlayer() {
         if (simpleExoPlayer == null) {
-            TrackSelection.Factory trackSelection = new RandomTrackSelection.Factory();
-            TrackSelector trackSelector = new DefaultTrackSelector(trackSelection);
-            simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+            simpleExoPlayer = new SimpleExoPlayer.Builder(this).build();
         }
         return simpleExoPlayer;
     }

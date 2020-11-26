@@ -17,26 +17,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.ExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.RandomTrackSelection;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 import com.smartadserver.android.instreamsdk.admanager.SVSAdManager;
 import com.smartadserver.android.instreamsdk.adrules.SVSAdRule;
@@ -75,8 +63,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     private boolean adManagerStarted;
 
     // ExoPlayer related properties
-    private DefaultBandwidthMeter defaultBandwidthMeter;
-    private PlayerView simpleExoPlayerView;
+    private PlayerView exoPlayerView;
     private SimpleExoPlayer simpleExoPlayer;
     private ImageButton fullscreenButton;
     private ImageButton fullscreenExitButton;
@@ -180,8 +167,8 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
      * Bind all views to their related properties.
      */
     private void bindViews() {
-        simpleExoPlayerView = findViewById(R.id.simple_exo_player_view);
-        simpleExoPlayerView.setControllerAutoShow(false);
+        exoPlayerView = findViewById(R.id.exo_player_view);
+        exoPlayerView.setControllerAutoShow(false);
         contentPlayerContainer = findViewById(R.id.content_player_container);
         fullscreenButton = findViewById(R.id.bt_fullscreen);
         fullscreenExitButton = findViewById(R.id.bt_fullscreen_exit);
@@ -217,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     private void configurePlayer() {
 
         // connect the ExoPlayer view with the player instance
-        simpleExoPlayerView.setPlayer(getExoPlayer());
+        exoPlayerView.setPlayer(getExoPlayer());
 
         // add a listener on ExoPlayer to detect when the video actually starts playing, to start the SVSAdManager
         getExoPlayer().addListener(new Player.EventListener() {
@@ -266,22 +253,14 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
             }
         });
 
-        // initialize video source
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this, Util.getUserAgent(this, getString(R.string.app_name)),
-                getDefaultBandwidthMeter());
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-
         Uri videoUri = Uri.parse(CONTENT_VIDEO_URL);
-        ExtractorMediaSource.Factory factory = new ExtractorMediaSource.Factory(dataSourceFactory);
-        factory.setExtractorsFactory(extractorsFactory);
-        MediaSource mediaSource = factory.createMediaSource(videoUri);
-
 
         // set media source on ExoPLayer
-        getExoPlayer().prepare(mediaSource);
+        getExoPlayer().setMediaItem(MediaItem.fromUri(videoUri));
+        getExoPlayer().prepare();
 
-        // start ExPlayer once prepared
-        getExoPlayer().setPlayWhenReady(true);
+        // do not start ExPlayer once prepared, the ad manager will take care of it
+        getExoPlayer().setPlayWhenReady(false);
     }
 
     /**
@@ -444,17 +423,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
          * the SVSContentPlayerPlugin interface. Here, we instantiate a ready-to-use SVSExoPlayerPlugin
          * for the ExoPlayer.
          ************************************************************************************************/
-        return new SVSExoPlayerPlugin(simpleExoPlayer, simpleExoPlayerView, contentPlayerContainer, false);
-    }
-
-    /**
-     * Lazy loaded defaultBandwidthMeter getter.
-     */
-    protected DefaultBandwidthMeter getDefaultBandwidthMeter() {
-        if (defaultBandwidthMeter == null) {
-            defaultBandwidthMeter = new DefaultBandwidthMeter();
-        }
-        return defaultBandwidthMeter;
+        return new SVSExoPlayerPlugin(simpleExoPlayer, exoPlayerView, contentPlayerContainer, false);
     }
 
     /**
@@ -462,9 +431,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
      */
     private SimpleExoPlayer getExoPlayer() {
         if (simpleExoPlayer == null) {
-            TrackSelection.Factory trackSelection = new RandomTrackSelection.Factory();
-            TrackSelector trackSelector = new DefaultTrackSelector(trackSelection);
-            simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+            simpleExoPlayer = new SimpleExoPlayer.Builder(this).build();
         }
         return simpleExoPlayer;
     }
@@ -524,7 +491,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
 
         // Update simpleExoPlayerView and contentPlayerContainer layoutParams to make the player take
         // all the screen when entering fullscreen.
-        simpleExoPlayerView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, isFullscreen ? ViewGroup.LayoutParams.MATCH_PARENT : ViewGroup.LayoutParams.WRAP_CONTENT));
+        exoPlayerView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, isFullscreen ? ViewGroup.LayoutParams.MATCH_PARENT : ViewGroup.LayoutParams.WRAP_CONTENT));
         contentPlayerContainer.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, isFullscreen ? ViewGroup.LayoutParams.MATCH_PARENT : ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
