@@ -372,7 +372,6 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     public void onFullscreenStateChangeRequest(boolean isFullscreen) {
         // Called when the enter (or exit) fullscreen button of an Ad is clicked by the user.
         // Adapt you UI to properly react to this user action: you should resize your container view.
-        setFullscreen(isFullscreen);
 
         // Tell the Brightcove Player that the fullscreen state changed.
         brightcoveExoPlayerVideoView.getEventEmitter().emit(isFullscreen ? EventType.ENTER_FULL_SCREEN : EventType.EXIT_FULL_SCREEN);

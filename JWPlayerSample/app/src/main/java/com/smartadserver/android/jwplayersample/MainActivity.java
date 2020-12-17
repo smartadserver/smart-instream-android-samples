@@ -1,24 +1,28 @@
 package com.smartadserver.android.jwplayersample;
 
 import android.annotation.SuppressLint;
-
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.longtailvideo.jwplayer.JWPlayerFragment;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.longtailvideo.jwplayer.JWPlayerView;
+import com.longtailvideo.jwplayer.events.BufferChangeEvent;
+import com.longtailvideo.jwplayer.events.listeners.VideoPlayerEvents;
 import com.longtailvideo.jwplayer.fullscreen.FullscreenHandler;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 import com.smartadserver.android.instreamsdk.admanager.SVSAdManager;
 import com.smartadserver.android.instreamsdk.adrules.SVSAdRule;
 import com.smartadserver.android.instreamsdk.adrules.SVSAdRuleData;
+import com.smartadserver.android.instreamsdk.model.adbreak.SVSAdBreakType;
+import com.smartadserver.android.instreamsdk.model.adbreak.event.SVSAdBreakEvent;
 import com.smartadserver.android.instreamsdk.model.adplacement.SVSAdPlacement;
 import com.smartadserver.android.instreamsdk.model.adplayerconfig.SVSAdPlayerConfiguration;
 import com.smartadserver.android.instreamsdk.model.contentdata.SVSContentData;
@@ -26,8 +30,6 @@ import com.smartadserver.android.instreamsdk.plugin.SVSJWPlayerPlugin;
 import com.smartadserver.android.instreamsdk.util.SVSLibraryInfo;
 
 import java.lang.reflect.Field;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Simple activity that contains one an instance of {@link JWPlayerView} as content player
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
 
     // content video url
     static final private String CONTENT_VIDEO_URL = "https://ns.sascdn.com/mobilesdk/samples/videos/BigBuckBunnyTrailer_360p.mp4";
+//    static final private String CONTENT_VIDEO_URL = "https://d3hjh6d7n71rqm.cloudfront.net/mediasfiles/2020/1/10/1578656618/1578656618/2020-01-10-124338.588987rptpq.mp4";
+
 
     // Smart Instream SDK placement parameters
     static final public int SITE_ID = 205812;
@@ -123,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
         if (adManager != null) {
             adManager.onResume();
         }
+        jwPlayerView.onResume();
     }
 
     /**
@@ -134,6 +139,8 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
         if (adManager != null) {
             adManager.onPause();
         }
+        jwPlayerView.onPause();
+
     }
 
     /**
@@ -145,16 +152,17 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
         if (adManager != null) {
             adManager.onDestroy();
         }
+        jwPlayerView.onDestroy();
     }
 
     /**
      * Bind all views to their related attributes.
      */
     private void bindViews() {
-        JWPlayerFragment jwFragment = (JWPlayerFragment) getFragmentManager().findFragmentById(R.id.jw_video_player);
-        jwPlayerView = jwFragment.getPlayer();
-        jwFragment.onResume();
-        jwFragment.setFullscreenOnDeviceRotate(true);
+         jwPlayerView = (JWPlayerView)findViewById(R.id.jw_video_player);
+//        jwPlayerView = jwFragment.getPlayer();
+//        jwFragment.onResume();
+//        jwFragment.setFullscreenOnDeviceRotate(true);
         contentPlayerContainer = findViewById(R.id.content_player_container);
     }
 
@@ -164,30 +172,15 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     private void configurePlayer() {
         PlaylistItem playlistItem = new PlaylistItem(CONTENT_VIDEO_URL);
 
-        // here is the issue : jwPlayerView returns 0 duration until after "some time" play was requested.
-        // so the trick is to
-        // 1 - hide JW Player
-        //jwPlayerView.setVisibility(View.INVISIBLE);
-        // 2 - load the video
-        jwPlayerView.load(playlistItem);
-        // 3 - call jwPlayerView.play()
-        jwPlayerView.play();
-
-        // 4 - start a timer that polls the duration until it is > 0
-        final Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        jwPlayerView.addOnBufferChangeListener(new VideoPlayerEvents.OnBufferChangeListener() {
             @Override
-            public void run() {
-                long duration = jwPlayerView.getDuration();
-                if (duration > 0) {
-                    // 5 - call jwPlayerView.pause(), cancel the timer and call configureAds() that eventually starts the SVSAdManager
+            public void onBufferChange(BufferChangeEvent bufferChangeEvent) {
+                if(!adManagerStarted && bufferChangeEvent.getDuration()>0){
                     jwPlayerView.pause();
-                    timer.cancel();
                     startAdManager();
                 }
             }
-        }, 0, 250);
-
+        });
 
         // add a full screen handler object on the JWPLayer player view
         jwPlayerView.setFullscreenHandler(new FullscreenHandler() {
@@ -232,8 +225,16 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
             }
         });
 
-        // start loading video
+        // here is the issue : jwPlayerView returns 0 duration until after "some time" play was requested.
+        // so the trick is to
+        // 1 - hide JW Player
+//        jwPlayerView.setVisibility(View.INVISIBLE);
+        jwPlayerView.setMute(true);
+
+        // start loading and playing video until content duration is known in OnBufferChangeListener,
+        // which will in turn pause it and start the SVSAdManager for a preroll
         jwPlayerView.load(playlistItem);
+        jwPlayerView.play();
     }
 
     /**

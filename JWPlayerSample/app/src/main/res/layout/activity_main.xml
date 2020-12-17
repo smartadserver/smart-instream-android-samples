@@ -22,12 +22,12 @@
         android:background="#000"
         android:layout_alignParentTop="true">
 
-        <fragment
+        <com.longtailvideo.jwplayer.JWPlayerView
+            xmlns:jwp="http://schemas.android.com/apk/lib/com.longtailvideo.jwplayer"
             android:id="@+id/jw_video_player"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:name="com.longtailvideo.jwplayer.JWPlayerFragment"
-            tools:layout="@layout/jw_player_fragment_sample_layout" />
+            android:layout_marginTop="20dp"/>
 
     </FrameLayout>
 

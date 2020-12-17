@@ -7,6 +7,12 @@ import android.view.ViewGroup;
 
 import com.longtailvideo.jwplayer.JWPlayerView;
 import com.longtailvideo.jwplayer.core.PlayerState;
+import com.longtailvideo.jwplayer.events.AdCompleteEvent;
+import com.longtailvideo.jwplayer.events.BeforePlayEvent;
+import com.longtailvideo.jwplayer.events.CompleteEvent;
+import com.longtailvideo.jwplayer.events.PauseEvent;
+import com.longtailvideo.jwplayer.events.PlayEvent;
+import com.longtailvideo.jwplayer.events.SeekedEvent;
 import com.longtailvideo.jwplayer.events.listeners.AdvertisingEvents;
 import com.longtailvideo.jwplayer.events.listeners.VideoPlayerEvents;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
@@ -38,34 +44,46 @@ public class SVSJWPlayerPlugin implements SVSContentPlayerPlugin {
         this.isLiveContent = isLiveContent;
 
         jwPlayerView.addOnCompleteListener(new VideoPlayerEvents.OnCompleteListener() {
+
             @Override
-            public void onComplete() {
+            public void onComplete(CompleteEvent completeEvent) {
                 contentHasCompleted = true;
             }
         });
+
+        jwPlayerView.addOnAdCompleteListener(new AdvertisingEvents.OnAdCompleteListener() {
+            @Override
+            public void onAdComplete(AdCompleteEvent adCompleteEvent) {
+                contentHasCompleted = true;
+            }
+        });
+
         jwPlayerView.addOnSeekedListener(new VideoPlayerEvents.OnSeekedListener() {
             @Override
-            public void onSeeked() {
+            public void onSeeked(SeekedEvent seekedEvent) {
                 contentHasCompleted = false;
             }
+
         });
         jwPlayerView.addOnPauseListener(new VideoPlayerEvents.OnPauseListener() {
             @Override
-            public void onPause(PlayerState playerState) {
+            public void onPause(PauseEvent pauseEvent) {
                 isPlaying = false;
             }
+
         });
         jwPlayerView.addOnPlayListener(new VideoPlayerEvents.OnPlayListener() {
             @Override
-            public void onPlay(PlayerState playerState) {
+            public void onPlay(PlayEvent playEvent) {
                 isPlaying = true;
             }
+
         });
 
 
         jwPlayerView.addOnBeforePlayListener(new AdvertisingEvents.OnBeforePlayListener() {
             @Override
-            public void onBeforePlay() {
+            public void onBeforePlay(BeforePlayEvent beforePlayEvent) {
                 contentHasCompleted = false;
             }
         });
@@ -82,10 +100,10 @@ public class SVSJWPlayerPlugin implements SVSContentPlayerPlugin {
             public void run() {
                 // show JWplayer
                 jwPlayerView.setVisibility(View.VISIBLE);
+                jwPlayerView.setMute(false);
                 if (!contentHasCompleted && !isPlaying()) {
                     jwPlayerView.play();
                 }
-
             }
         });
     }
@@ -121,7 +139,7 @@ public class SVSJWPlayerPlugin implements SVSContentPlayerPlugin {
      */
     @Override
     public long getContentDuration() {
-        return isLiveContent ? -1 : jwPlayerView.getDuration();
+        return isLiveContent ? -1 : (long)(jwPlayerView.getDuration() * 1000);
     }
 
     /**
@@ -129,7 +147,7 @@ public class SVSJWPlayerPlugin implements SVSContentPlayerPlugin {
      */
     @Override
     public long getCurrentPosition() {
-        long currentPosition = contentHasCompleted ? getContentDuration():jwPlayerView.getPosition();
+        long currentPosition = contentHasCompleted ? getContentDuration():(long)(jwPlayerView.getPosition() * 1000);
         return currentPosition;
     }
 

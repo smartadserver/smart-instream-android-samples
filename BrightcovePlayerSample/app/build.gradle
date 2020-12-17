@@ -36,8 +36,14 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
 
     // Import Brightcove SDK
-    implementation 'com.brightcove.player:exoplayer:4.+'
+    implementation 'com.brightcove.player:exoplayer2:6.16.0'
+
+    // Brightcove 6.16.0 requires ExoPlayer 2.11.8, using the latest version of ExoPlayer will crash the app
+    implementation('com.google.android.exoplayer:exoplayer-core') { version { strictly '2.11.8' } }
+    implementation('com.google.android.exoplayer:exoplayer-ui') { version { strictly '2.11.8' } }
+    implementation('com.google.android.exoplayer:exoplayer-dash') { version { strictly '2.11.8' } }
+    implementation('com.google.android.exoplayer:exoplayer-hls') { version { strictly '2.11.8' } }
 
     // Import Smart Instream SDK
-    implementation 'com.smartadserver.android:smart-instream-sdk:7.7.2'
+    implementation 'com.smartadserver.android:smart-instream-sdk:7.9.0'
 }
