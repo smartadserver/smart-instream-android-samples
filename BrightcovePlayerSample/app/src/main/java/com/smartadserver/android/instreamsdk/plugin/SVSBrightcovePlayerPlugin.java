@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+
 import com.brightcove.player.event.Event;
 import com.brightcove.player.event.EventListener;
 import com.brightcove.player.event.EventType;
@@ -18,8 +20,11 @@ import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
  */
 public class SVSBrightcovePlayerPlugin implements SVSContentPlayerPlugin {
 
+    @NonNull
     private Handler mainHandler;
+    @NonNull
     private ViewGroup contentPlayerContainer;
+    @NonNull
     private BrightcoveExoPlayerVideoView brightcoveExoPlayerVideoView;
     private boolean isLiveContent;
 
@@ -31,7 +36,7 @@ public class SVSBrightcovePlayerPlugin implements SVSContentPlayerPlugin {
      * @param brightcoveExoPlayerVideoView the BrightcoveExoPlayerVideoView object
      * @param contentPlayerContainer the ViewGroup containing the BrightcoveExoPlayerVideoView object
      */
-    public SVSBrightcovePlayerPlugin(BrightcoveExoPlayerVideoView brightcoveExoPlayerVideoView, ViewGroup contentPlayerContainer, boolean isLiveContent) {
+    public SVSBrightcovePlayerPlugin(@NonNull BrightcoveExoPlayerVideoView brightcoveExoPlayerVideoView, @NonNull ViewGroup contentPlayerContainer, boolean isLiveContent) {
         this.mainHandler = new Handler(Looper.getMainLooper());
         this.brightcoveExoPlayerVideoView = brightcoveExoPlayerVideoView;
         this.contentPlayerContainer = contentPlayerContainer;
@@ -117,10 +122,17 @@ public class SVSBrightcovePlayerPlugin implements SVSContentPlayerPlugin {
         return currentPosition;
     }
 
+    @Override
+    public float getContentPlayerVolumeLevel() {
+        // We can't retrieve player's volume level. Return 1 by default.
+        return 1;
+    }
+
     /**
      * Returns the {@link ViewGroup} component that contains the content player
      */
     @Override
+    @NonNull
     public ViewGroup getContentPlayerContainer() {
         return contentPlayerContainer;
     }

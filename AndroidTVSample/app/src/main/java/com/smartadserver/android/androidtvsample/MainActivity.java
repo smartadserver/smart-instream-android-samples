@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.view.KeyEvent;
 import android.view.View;
@@ -28,12 +29,16 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 import com.smartadserver.android.instreamsdk.admanager.SVSAdManager;
+import com.smartadserver.android.instreamsdk.admanager.SVSCuePoint;
 import com.smartadserver.android.instreamsdk.adrules.SVSAdRule;
 import com.smartadserver.android.instreamsdk.adrules.SVSAdRuleData;
+import com.smartadserver.android.instreamsdk.model.adbreak.event.SVSAdBreakEvent;
 import com.smartadserver.android.instreamsdk.model.adplacement.SVSAdPlacement;
 import com.smartadserver.android.instreamsdk.model.adplayerconfig.SVSAdPlayerConfiguration;
 import com.smartadserver.android.instreamsdk.model.contentdata.SVSContentData;
 import com.smartadserver.android.instreamsdk.plugin.SVSExoPlayerPlugin;
+
+import java.util.List;
 
 /**
  * Simple activity that contains one an instance of {@link com.google.android.exoplayer2.ExoPlayer} as content player
@@ -73,7 +78,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
      * Performs Activity initialization after creation.
      */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -153,7 +158,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
      * Detects remote button event to show controls.
      */
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    public boolean onKeyDown(int keyCode, @Nullable KeyEvent event) {
 
         // if an adBreak is playing, do not let the remote controls the player.
         if (adBreakStarted) {
@@ -331,6 +336,19 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
         // Create the SVSAdManager instance.
         adManager = new SVSAdManager(this, adPlacement, adRules, adPlayerConfiguration, contentData);
         adManager.addUIInteractionListener(this);
+
+        adManager.addAdManagerListener(new SVSAdManager.AdManagerListener() {
+            @Override
+            public void onAdBreakEvent(@NonNull SVSAdBreakEvent svsAdBreakEvent) {
+                // Called for any event concerning AdBreaks such as Start, Complete, etc.
+            }
+
+            @Override
+            public void onCuePointsGenerated(@NonNull List<SVSCuePoint> list) {
+                // Called when cuepoints used for midroll ad break have been computed.
+                // You can use this method to display the ad break position in your content player UI…
+            }
+        });
     }
 
     /**
@@ -349,6 +367,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     /**
      * Creates a {@link SVSAdPlacement} instance
      */
+    @NonNull
     private SVSAdPlacement instantiateAdPlacement() {
         /***************************************************************
          * SVSAdPlacement is mandatory to perform ad calls.
@@ -370,6 +389,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     /**
      * Creates an array of {@link SVSAdRule} instances
      */
+    @NonNull
     private SVSAdRule[] instantiateAdRules() {
         /***********************************************************************************
          * SVSAdRule objects allow an advanced management of your advertising policy.
@@ -394,6 +414,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     /**
      * Creates a {@link SVSAdPlayerConfiguration} instance
      */
+    @NonNull
     private SVSAdPlayerConfiguration instantiateAdPlayerConfiguration() {
         /*************************************************************************************************
          * SVSAdPlayerConfiguration is responsible for modifying the look and behavior ot the Ad Player.
@@ -438,6 +459,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     /**
      * Creates the {@link SVSExoPlayerPlugin} that connects the {@link SVSAdManager} intance to the ExoPlayer content player.
      */
+    @NonNull
     private SVSContentPlayerPlugin instantiateContentPlayerPlugin() {
         /************************************************************************************************
          * To know when to display AdBreaks, the SVSAdManager needs to monitor your content, especially:

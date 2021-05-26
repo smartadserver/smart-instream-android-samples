@@ -5,6 +5,8 @@ import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.exoplayer2.ExoPlayer;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 
@@ -16,10 +18,15 @@ import java.util.concurrent.Callable;
  */
 public class SVSExoPlayerPlugin implements SVSContentPlayerPlugin {
 
+    @NonNull
     private Handler mainHandler;
+    @NonNull
     private Handler exoPlayerHandler;
+    @NonNull
     private ViewGroup contentPlayerContainer;
+    @NonNull
     private ExoPlayer exoPlayer;
+    @NonNull
     private View exoPlayerView;
     private boolean isLiveContent;
 
@@ -29,7 +36,7 @@ public class SVSExoPlayerPlugin implements SVSContentPlayerPlugin {
      * @param exoPlayerView the View where the ExoPlayer renders the video
      * @param contentPlayerContainer the ViewGroup containing the VideoViewExoPlayer view
      */
-    public SVSExoPlayerPlugin(ExoPlayer exoPlayer, View exoPlayerView, ViewGroup contentPlayerContainer, boolean isLiveContent) {
+    public SVSExoPlayerPlugin(@NonNull ExoPlayer exoPlayer, @NonNull View exoPlayerView, @NonNull ViewGroup contentPlayerContainer, boolean isLiveContent) {
         this.mainHandler = new Handler(Looper.getMainLooper());
         // create another handler for exoplayer related code only if exoplayer was not created in the main thread
         this.exoPlayerHandler = exoPlayer.getApplicationLooper() == Looper.getMainLooper() ?
@@ -90,8 +97,18 @@ public class SVSExoPlayerPlugin implements SVSContentPlayerPlugin {
      * Returns the {@link ViewGroup} component that contains the content player
      */
     @Override
+    @NonNull
     public ViewGroup getContentPlayerContainer() {
         return contentPlayerContainer;
+    }
+
+    @Override
+    public float getContentPlayerVolumeLevel() {
+        float volumeLevel = 0;
+        if (exoPlayer.getAudioComponent() != null) {
+            volumeLevel = exoPlayer.getAudioComponent().getVolume();
+        }
+        return volumeLevel;
     }
 
     /**
@@ -109,7 +126,7 @@ public class SVSExoPlayerPlugin implements SVSContentPlayerPlugin {
             public void run() {
                 try {
                     holder[0] = callable.call();
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
                 synchronized (this) {
                     this.notify();

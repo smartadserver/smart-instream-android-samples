@@ -5,6 +5,8 @@ import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+
 import com.longtailvideo.jwplayer.JWPlayerView;
 import com.longtailvideo.jwplayer.core.PlayerState;
 import com.longtailvideo.jwplayer.events.AdCompleteEvent;
@@ -23,8 +25,11 @@ import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
  */
 public class SVSJWPlayerPlugin implements SVSContentPlayerPlugin {
 
+    @NonNull
     private Handler mainHandler;
+    @NonNull
     private JWPlayerView jwPlayerView;
+    @NonNull
     private ViewGroup contentPlayerContainer;
     private boolean isPlaying = false;
     private boolean isLiveContent;
@@ -37,7 +42,7 @@ public class SVSJWPlayerPlugin implements SVSContentPlayerPlugin {
      * @param jwPlayerView the JWPlayerView object
      * @param contentPlayerContainer the ViewGroup containing the JWPlayerView object
      */
-    public SVSJWPlayerPlugin(JWPlayerView jwPlayerView, ViewGroup contentPlayerContainer, boolean isLiveContent) {
+    public SVSJWPlayerPlugin(@NonNull JWPlayerView jwPlayerView, @NonNull ViewGroup contentPlayerContainer, boolean isLiveContent) {
         this.mainHandler = new Handler(Looper.getMainLooper());
         this.jwPlayerView = jwPlayerView;
         this.contentPlayerContainer = contentPlayerContainer;
@@ -151,10 +156,17 @@ public class SVSJWPlayerPlugin implements SVSContentPlayerPlugin {
         return currentPosition;
     }
 
+    @Override
+    public float getContentPlayerVolumeLevel() {
+        // We can't retrieve player's volume level. Return 1 by default.
+        return 1;
+    }
+
     /**
      * Returns the {@link ViewGroup} component that contains the content player
      */
     @Override
+    @NonNull
     public ViewGroup getContentPlayerContainer() {
         return contentPlayerContainer;
     }

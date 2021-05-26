@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +21,7 @@ import com.longtailvideo.jwplayer.fullscreen.FullscreenHandler;
 import com.longtailvideo.jwplayer.media.playlists.PlaylistItem;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 import com.smartadserver.android.instreamsdk.admanager.SVSAdManager;
+import com.smartadserver.android.instreamsdk.admanager.SVSCuePoint;
 import com.smartadserver.android.instreamsdk.adrules.SVSAdRule;
 import com.smartadserver.android.instreamsdk.adrules.SVSAdRuleData;
 import com.smartadserver.android.instreamsdk.model.adbreak.SVSAdBreakType;
@@ -30,6 +33,7 @@ import com.smartadserver.android.instreamsdk.plugin.SVSJWPlayerPlugin;
 import com.smartadserver.android.instreamsdk.util.SVSLibraryInfo;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * Simple activity that contains one an instance of {@link JWPlayerView} as content player
@@ -67,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
      */
     @SuppressLint("SetTextI18n")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -174,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
 
         jwPlayerView.addOnBufferChangeListener(new VideoPlayerEvents.OnBufferChangeListener() {
             @Override
-            public void onBufferChange(BufferChangeEvent bufferChangeEvent) {
+            public void onBufferChange(@NonNull BufferChangeEvent bufferChangeEvent) {
                 if(!adManagerStarted && bufferChangeEvent.getDuration()>0){
                     jwPlayerView.pause();
                     startAdManager();
@@ -272,6 +276,19 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
         // Create the SVSAdManager instance.
         adManager = new SVSAdManager(this, adPlacement, adRules, adPlayerConfiguration, contentData);
         adManager.addUIInteractionListener(this);
+
+        adManager.addAdManagerListener(new SVSAdManager.AdManagerListener() {
+            @Override
+            public void onAdBreakEvent(@NonNull SVSAdBreakEvent svsAdBreakEvent) {
+                // Called for any event concerning AdBreaks such as Start, Complete, etc.
+            }
+
+            @Override
+            public void onCuePointsGenerated(@NonNull List<SVSCuePoint> list) {
+                // Called when cuepoints used for midroll ad break have been computed.
+                // You can use this method to display the ad break position in your content player UI…
+            }
+        });
     }
 
     /**
@@ -290,6 +307,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     /**
      * Creates a {@link SVSAdPlacement} instance
      */
+    @NonNull
     private SVSAdPlacement instantiateAdPlacement() {
         /***************************************************************
          * SVSAdPlacement is mandatory to perform ad calls.
@@ -311,6 +329,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     /**
      * Creates an array of {@link SVSAdRule} instances
      */
+    @NonNull
     private SVSAdRule[] instantiateAdRules() {
         /***********************************************************************************
          * SVSAdRule objects allow an advanced management of your advertising policy.
@@ -335,6 +354,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     /**
      * Creates a {@link SVSAdPlayerConfiguration} instance
      */
+    @NonNull
     private SVSAdPlayerConfiguration instantiateAdPlayerConfiguration() {
         /*************************************************************************************************
          * SVSAdPlayerConfiguration is responsible for modifying the look and behavior ot the Ad Player.
@@ -388,6 +408,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     /**
      * Creates the {@link SVSJWPlayerPlugin} that connects the {@link SVSAdManager} intance to the {@link JWPlayerView} content player.
      */
+    @NonNull
     private SVSContentPlayerPlugin instantiateContentPlayerPlugin() {
         /************************************************************************************************
          * To know when to display AdBreaks, the SVSAdManager needs to monitor your content, especially:
@@ -434,16 +455,21 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
 
             // Update SystemUIVisibility to hide/show the StatusBar, the ActionBar and the NavigationBar.
             int uiOptions = getWindow().getDecorView().getSystemUiVisibility();
+            ActionBar actionBar = getSupportActionBar();
             if (fullscreen) {
                 uiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
                 uiOptions |= View.SYSTEM_UI_FLAG_IMMERSIVE;
                 uiOptions |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-                getSupportActionBar().hide();
+                if (actionBar != null) {
+                    actionBar.hide();
+                }
             } else {
                 uiOptions &= ~View.SYSTEM_UI_FLAG_FULLSCREEN;
                 uiOptions &= ~View.SYSTEM_UI_FLAG_IMMERSIVE;
                 uiOptions &= ~View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-                getSupportActionBar().show();
+                if (actionBar != null) {
+                    actionBar.show();
+                }
             }
             getWindow().getDecorView().setSystemUiVisibility(uiOptions);
 
@@ -476,22 +502,24 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     /**
      * Workaround method to disable the show/hide animation and avoid making the ActionBar flicker.
      */
-    public static void disableShowHideAnimation(ActionBar actionBar) {
-        try {
-            actionBar.getClass().getDeclaredMethod("setShowHideAnimationEnabled", boolean.class).invoke(actionBar, false);
-        } catch (Exception exception) {
+    public static void disableShowHideAnimation(@Nullable ActionBar actionBar) {
+        if (actionBar != null) {
             try {
-                Field mActionBarField = actionBar.getClass().getSuperclass().getDeclaredField("mActionBar");
-                mActionBarField.setAccessible(true);
-                Object icsActionBar = mActionBarField.get(actionBar);
-                Field mShowHideAnimationEnabledField = icsActionBar.getClass().getDeclaredField("mShowHideAnimationEnabled");
-                mShowHideAnimationEnabledField.setAccessible(true);
-                mShowHideAnimationEnabledField.set(icsActionBar, false);
-                Field mCurrentShowAnimField = icsActionBar.getClass().getDeclaredField("mCurrentShowAnim");
-                mCurrentShowAnimField.setAccessible(true);
-                mCurrentShowAnimField.set(icsActionBar, null);
-            } catch (Exception e) {
-                e.printStackTrace();
+                actionBar.getClass().getDeclaredMethod("setShowHideAnimationEnabled", boolean.class).invoke(actionBar, false);
+            } catch (Exception exception) {
+                try {
+                    Field mActionBarField = actionBar.getClass().getSuperclass().getDeclaredField("mActionBar");
+                    mActionBarField.setAccessible(true);
+                    Object icsActionBar = mActionBarField.get(actionBar);
+                    Field mShowHideAnimationEnabledField = icsActionBar.getClass().getDeclaredField("mShowHideAnimationEnabled");
+                    mShowHideAnimationEnabledField.setAccessible(true);
+                    mShowHideAnimationEnabledField.set(icsActionBar, false);
+                    Field mCurrentShowAnimField = icsActionBar.getClass().getDeclaredField("mCurrentShowAnim");
+                    mCurrentShowAnimField.setAccessible(true);
+                    mCurrentShowAnimField.set(icsActionBar, null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

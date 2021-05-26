@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import androidx.annotation.NonNull;
+
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 
 /**
@@ -14,9 +16,13 @@ import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
  */
 public class SVSVideoViewPlugin implements SVSContentPlayerPlugin {
 
+    @NonNull
     private Handler mainHandler;
+    @NonNull
     private ViewGroup contentPlayerContainer;
+    @NonNull
     private VideoView videoView;
+    @NonNull
     private MediaController controls;
     private boolean isLiveContent;
     private boolean hasCompleted;
@@ -26,7 +32,7 @@ public class SVSVideoViewPlugin implements SVSContentPlayerPlugin {
      * @param videoView the VideoView handled by this plugin
      * @param contentPlayerContainer the ViewGroup containing the VideoView
      */
-    public SVSVideoViewPlugin(VideoView videoView, MediaController controls, ViewGroup contentPlayerContainer, boolean isLiveContent) {
+    public SVSVideoViewPlugin(@NonNull VideoView videoView, @NonNull MediaController controls, @NonNull ViewGroup contentPlayerContainer, boolean isLiveContent) {
         this.mainHandler = new Handler(Looper.getMainLooper());
         this.videoView = videoView;
         this.controls = controls;
@@ -84,6 +90,14 @@ public class SVSVideoViewPlugin implements SVSContentPlayerPlugin {
         return isLiveContent ? -1 : videoView.getDuration();
     }
 
+    /**
+     * Returns the content media volume level.
+     */
+    @Override
+    public float getContentPlayerVolumeLevel() {
+        // We can't retrieve player's volume level. Return 1 by default.
+        return 1;
+    }
 
     /**
      * Returns the current position in the content media
@@ -108,6 +122,7 @@ public class SVSVideoViewPlugin implements SVSContentPlayerPlugin {
      * Returns the {@link ViewGroup} component that contains the content player
      */
     @Override
+    @NonNull
     public ViewGroup getContentPlayerContainer() {
         return contentPlayerContainer;
     }

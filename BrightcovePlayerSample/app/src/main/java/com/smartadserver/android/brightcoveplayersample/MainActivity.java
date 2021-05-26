@@ -3,6 +3,8 @@ package com.smartadserver.android.brightcoveplayersample;
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,8 +22,10 @@ import com.brightcove.player.model.Video;
 import com.brightcove.player.view.BrightcoveExoPlayerVideoView;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 import com.smartadserver.android.instreamsdk.admanager.SVSAdManager;
+import com.smartadserver.android.instreamsdk.admanager.SVSCuePoint;
 import com.smartadserver.android.instreamsdk.adrules.SVSAdRule;
 import com.smartadserver.android.instreamsdk.adrules.SVSAdRuleData;
+import com.smartadserver.android.instreamsdk.model.adbreak.event.SVSAdBreakEvent;
 import com.smartadserver.android.instreamsdk.model.adplacement.SVSAdPlacement;
 import com.smartadserver.android.instreamsdk.model.adplayerconfig.SVSAdPlayerConfiguration;
 import com.smartadserver.android.instreamsdk.model.contentdata.SVSContentData;
@@ -29,6 +33,7 @@ import com.smartadserver.android.instreamsdk.plugin.SVSBrightcovePlayerPlugin;
 import com.smartadserver.android.instreamsdk.util.SVSLibraryInfo;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * Simple activity that contains one an instance of {@link BrightcoveExoPlayerVideoView} as content player
@@ -64,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
      */
     @SuppressLint("SetTextI18n")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -145,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
      * Overriden to adapt Activity layout on orientation changes.
      */
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
         // Automatically enter fullscreen if we rotating to landscape,
@@ -238,6 +243,19 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
         // Create the SVSAdManager instance.
         adManager = new SVSAdManager(this, adPlacement, adRules, adPlayerConfiguration, contentData);
         adManager.addUIInteractionListener(this);
+
+        adManager.addAdManagerListener(new SVSAdManager.AdManagerListener() {
+            @Override
+            public void onAdBreakEvent(@NonNull SVSAdBreakEvent svsAdBreakEvent) {
+                // Called for any event concerning AdBreaks such as Start, Complete, etc.
+            }
+
+            @Override
+            public void onCuePointsGenerated(@NonNull List<SVSCuePoint> list) {
+                // Called when cuepoints used for midroll ad break have been computed.
+                // You can use this method to display the ad break position in your content player UI…
+            }
+        });
     }
 
     /**
@@ -400,16 +418,21 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
 
         // Update SystemUIVisibility to hide/show the StatusBar, the ActionBar and the NavigationBar.
         int uiOptions = getWindow().getDecorView().getSystemUiVisibility();
+        ActionBar actionBar = getSupportActionBar();
         if (isFullscreen) {
             uiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
             uiOptions |= View.SYSTEM_UI_FLAG_IMMERSIVE;
             uiOptions |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-            getSupportActionBar().hide();
+            if (actionBar != null) {
+                actionBar.hide();
+            }
         } else {
             uiOptions &= ~View.SYSTEM_UI_FLAG_FULLSCREEN;
             uiOptions &= ~View.SYSTEM_UI_FLAG_IMMERSIVE;
             uiOptions &= ~View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-            getSupportActionBar().show();
+            if (actionBar != null) {
+                actionBar.show();
+            }
         }
         getWindow().getDecorView().setSystemUiVisibility(uiOptions);
 
@@ -425,22 +448,24 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     /**
      * Workaround method to disable the show/hide animation and avoid making the ActionBar flicker.
      */
-    public static void disableShowHideAnimation(ActionBar actionBar) {
-        try {
-            actionBar.getClass().getDeclaredMethod("setShowHideAnimationEnabled", boolean.class).invoke(actionBar, false);
-        } catch (Exception exception) {
+    public static void disableShowHideAnimation(@Nullable ActionBar actionBar) {
+        if (actionBar != null) {
             try {
-                Field mActionBarField = actionBar.getClass().getSuperclass().getDeclaredField("mActionBar");
-                mActionBarField.setAccessible(true);
-                Object icsActionBar = mActionBarField.get(actionBar);
-                Field mShowHideAnimationEnabledField = icsActionBar.getClass().getDeclaredField("mShowHideAnimationEnabled");
-                mShowHideAnimationEnabledField.setAccessible(true);
-                mShowHideAnimationEnabledField.set(icsActionBar, false);
-                Field mCurrentShowAnimField = icsActionBar.getClass().getDeclaredField("mCurrentShowAnim");
-                mCurrentShowAnimField.setAccessible(true);
-                mCurrentShowAnimField.set(icsActionBar, null);
-            } catch (Exception e) {
-                e.printStackTrace();
+                actionBar.getClass().getDeclaredMethod("setShowHideAnimationEnabled", boolean.class).invoke(actionBar, false);
+            } catch (Exception exception) {
+                try {
+                    Field mActionBarField = actionBar.getClass().getSuperclass().getDeclaredField("mActionBar");
+                    mActionBarField.setAccessible(true);
+                    Object icsActionBar = mActionBarField.get(actionBar);
+                    Field mShowHideAnimationEnabledField = icsActionBar.getClass().getDeclaredField("mShowHideAnimationEnabled");
+                    mShowHideAnimationEnabledField.setAccessible(true);
+                    mShowHideAnimationEnabledField.set(icsActionBar, false);
+                    Field mCurrentShowAnimField = icsActionBar.getClass().getDeclaredField("mCurrentShowAnim");
+                    mCurrentShowAnimField.setAccessible(true);
+                    mCurrentShowAnimField.set(icsActionBar, null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
