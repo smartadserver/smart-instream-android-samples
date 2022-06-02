@@ -3,11 +3,6 @@ package com.smartadserver.android.exoplayersample;
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.net.Uri;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +12,14 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.exoplayer2.ExoPlaybackException;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 import com.smartadserver.android.instreamsdk.admanager.SVSAdManager;
@@ -211,49 +206,14 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
         exoPlayerView.setPlayer(getExoPlayer());
 
         // add a listener on ExoPlayer to detect when the video actually starts playing, to start the SVSAdManager
-        getExoPlayer().addListener(new Player.EventListener() {
-            @Override
-            public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
-            }
+        getExoPlayer().addListener(new Player.Listener() {
 
             @Override
-            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-            }
-
-            @Override
-            public void onLoadingChanged(boolean isLoading) {
-            }
-
-            @Override
-            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+            public void onPlaybackStateChanged(int playbackState) {
                 // start the SVSAdManager only when the player is about to play.
                 if (playbackState == Player.STATE_READY && !adManagerStarted) {
                     startAdManager();
                 }
-            }
-
-            @Override
-            public void onRepeatModeChanged(int repeatMode) {
-            }
-
-            @Override
-            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-            }
-
-            @Override
-            public void onPlayerError(ExoPlaybackException error) {
-            }
-
-            @Override
-            public void onPositionDiscontinuity(int reason) {
-            }
-
-            @Override
-            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-            }
-
-            @Override
-            public void onSeekProcessed() {
             }
         });
 

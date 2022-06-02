@@ -18,13 +18,13 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
 
         // Smart AdServer repository
         maven { url 'https://packagecloud.io/smartadserver/android/maven2' }
 
-        // Huawei services dependencies repository
-        maven { url 'http://developer.huawei.com/repo/' }
+        // Huawei services dependencies repository (uncomment to enable)
+        // maven { url 'https://developer.huawei.com/repo/' }
 
     }
 }
