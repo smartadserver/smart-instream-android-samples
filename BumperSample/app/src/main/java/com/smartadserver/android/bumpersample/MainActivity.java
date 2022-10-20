@@ -441,7 +441,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
          ***********************************************************************************/
 
         // Instantiate 3 SVSadruleData for Preroll, Midroll and Postroll.
-        SVSAdRuleData prerollData = SVSAdRuleData.createPrerollAdRuleData(2, 1200); // Preroll with 1 ad.
+        SVSAdRuleData prerollData = SVSAdRuleData.createPrerollAdRuleData(1, 1200); // Preroll with 1 ad.
         SVSAdRuleData midrollData = SVSAdRuleData.createMidrollAdRuleData(2, 1200, new double[]{50}); // Midroll with 1 ad when 50% of the content's duration is reached.
         SVSAdRuleData postrollData = SVSAdRuleData.createPostrollAdRuleData(2, 1200); // Postroll with 1 ad.
 
