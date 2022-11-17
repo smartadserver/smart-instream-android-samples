@@ -238,49 +238,14 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
         exoPlayerView.setPlayer(getExoPlayer());
 
         // add a listener on ExoPlayer to detect when the video actually starts playing, to start the SVSAdManager
-        getExoPlayer().addListener(new Player.EventListener() {
-            @Override
-            public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
-            }
+        getExoPlayer().addListener(new Player.Listener() {
 
             @Override
-            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-            }
-
-            @Override
-            public void onLoadingChanged(boolean isLoading) {
-            }
-
-            @Override
-            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+            public void onPlaybackStateChanged(int playbackState) {
                 // start the SVSAdManager only when the player is about to play.
                 if (playbackState == Player.STATE_READY && !adManagerStarted) {
                     startAdManager();
                 }
-            }
-
-            @Override
-            public void onRepeatModeChanged(int repeatMode) {
-            }
-
-            @Override
-            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-            }
-
-            @Override
-            public void onPlayerError(ExoPlaybackException error) {
-            }
-
-            @Override
-            public void onPositionDiscontinuity(int reason) {
-            }
-
-            @Override
-            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-            }
-
-            @Override
-            public void onSeekProcessed() {
             }
         });
 

@@ -3,12 +3,6 @@ package com.smartadserver.android.bumpersample;
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.net.Uri;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,14 +15,14 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.exoplayer2.ExoPlaybackException;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 import com.smartadserver.android.instreamsdk.admanager.SVSAdManager;
@@ -87,6 +81,12 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     private boolean isPaused;
     private boolean shouldStartAdBreak;
     private boolean shouldResumeContent;
+
+    // flags to monitor ad break status
+    boolean isAdBreakReady = false;
+    boolean isAdBreakPlaying = false;
+
+    Handler handler = new Handler(Looper.getMainLooper());
 
     /**
      * Performs Activity initialization after creation.
@@ -239,49 +239,14 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
         exoPlayerView.setPlayer(getExoPlayer());
 
         // add a listener on ExoPlayer to detect when the video actually starts playing, to start the SVSAdManager
-        getExoPlayer().addListener(new Player.EventListener() {
-            @Override
-            public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
-            }
+        getExoPlayer().addListener(new Player.Listener() {
 
             @Override
-            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-            }
-
-            @Override
-            public void onLoadingChanged(boolean isLoading) {
-            }
-
-            @Override
-            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+            public void onPlaybackStateChanged(int playbackState) {
                 // start the SVSAdManager only when the player is about to play.
                 if (playbackState == Player.STATE_READY && !adManagerStarted) {
                     startAdManager();
                 }
-            }
-
-            @Override
-            public void onRepeatModeChanged(int repeatMode) {
-            }
-
-            @Override
-            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-            }
-
-            @Override
-            public void onPlayerError(ExoPlaybackException error) {
-            }
-
-            @Override
-            public void onPositionDiscontinuity(int reason) {
-            }
-
-            @Override
-            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-            }
-
-            @Override
-            public void onSeekProcessed() {
             }
         });
 
@@ -330,55 +295,53 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
         // Create the SVSAdManager instance.
         adManager = new SVSAdManager(this, adPlacement, adRules, adPlayerConfiguration, contentData);
         adManager.addUIInteractionListener(this);
+
         adManager.addAdManagerListener(new SVSAdManager.AdManagerListener() {
+
             @Override
-            public void onAdBreakEvent(@NonNull SVSAdBreakEvent svsAdBreakEvent) {
-                Handler handler = new Handler(Looper.getMainLooper());
+            public void onAdBreakEvent(@NonNull SVSAdBreakEvent adBreakEvent) {
 
-                // apply the bumper logic only if ad break autoplay is disabled
                 if (!adPlayerConfiguration.getPublisherOptions().isEnableAdBreakAutoplay()) {
-                    switch (svsAdBreakEvent.getEventType()) {
+                    switch (adBreakEvent.getEventType()) {
                         case SVSAdBreakEvent.EVENT_TYPE_AD_BREAK_READY:
-                            // The ad break is ready, pause the content player.
-                            getExoPlayer().setPlayWhenReady(false);
 
-                            // Make sur the content player is invisible.
-                            exoPlayerView.setVisibility(View.INVISIBLE);
+                            // mark that an ad break is ready to be played
+                            isAdBreakReady = true;
 
-                            // And display the start bumper
-                            adBreakBeginBumper.setVisibility(View.VISIBLE);
-
-                            handler.postDelayed(() -> {
-                                // Hide the start bumper.
-                                adBreakBeginBumper.setVisibility(View.GONE);
-
-                                if (isPaused) {
-                                    shouldStartAdBreak = true;
-                                } else {
-                                    adManager.startAdBreak();
-                                }
-
-                            }, BUMPER_DURATION);
+                            // If no ad break is currently playing only, start the received ad break.
+                            if (!isAdBreakPlaying) {
+                                getExoPlayer().setPlayWhenReady(false);
+                                startAdBreakSequence();
+                            }
                             break;
-
                         case SVSAdBreakEvent.EVENT_TYPE_AD_BREAK_COMPLETED:
-                            // the ad break is complete, display the end bumper
+
                             adBreakEndBumper.setVisibility(View.VISIBLE);
 
-                            handler.postDelayed(() -> {
-                                // After bumper duration, hide it again
-                                adBreakEndBumper.setVisibility(View.GONE);
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
 
-                                // And resume the content
-                                if (isPaused) {
-                                    shouldResumeContent = true;
-                                } else {
-                                    adManager.resumeContent();
+                                    adBreakEndBumper.setVisibility(View.GONE);
+
+                                    // collision case : if an ad break got ready while the previous one was still being displayed (bumpers display included),
+                                    // just play it as if it was the first one (including start and end bumpers)
+                                    if (isAdBreakReady) {
+                                        startAdBreakSequence();
+                                    } else {
+                                        // And resume the content
+                                        isAdBreakPlaying = false;
+                                        adBreakBeginBumper.setVisibility(View.GONE);
+
+                                        if (isPaused) {
+                                            shouldResumeContent = true;
+                                        } else {
+                                            adManager.resumeContent();
+                                        }
+                                    }
                                 }
-
                             }, BUMPER_DURATION);
                             break;
-
                         default:
                             break;
                     }
@@ -391,6 +354,30 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
                 // You can use this method to display the ad break position in your content player UI…
             }
         });
+    }
+
+    /**
+     * Convenience method to show start bumper for 3 seconds, then start the ad break ready to be played
+     */
+    private void startAdBreakSequence() {
+
+        // mark that an ad break is being played, and consumed.
+        isAdBreakPlaying = true;
+        isAdBreakReady = false;
+
+        adBreakBeginBumper.setVisibility(View.VISIBLE);
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                adBreakBeginBumper.setVisibility(View.GONE);
+                if (isPaused) {
+                    shouldStartAdBreak = true;
+                } else {
+                    adManager.startAdBreak();
+                }
+            }
+        }, BUMPER_DURATION);
     }
 
     /**
@@ -442,8 +429,8 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
 
         // Instantiate 3 SVSadruleData for Preroll, Midroll and Postroll.
         SVSAdRuleData prerollData = SVSAdRuleData.createPrerollAdRuleData(1, 1200); // Preroll with 1 ad.
-        SVSAdRuleData midrollData = SVSAdRuleData.createMidrollAdRuleData(2, 1200, new double[]{50}); // Midroll with 1 ad when 50% of the content's duration is reached.
-        SVSAdRuleData postrollData = SVSAdRuleData.createPostrollAdRuleData(2, 1200); // Postroll with 1 ad.
+        SVSAdRuleData midrollData = SVSAdRuleData.createMidrollAdRuleData(1, 1200, new double[]{50}); // Midroll with 1 ad when 50% of the content's duration is reached.
+        SVSAdRuleData postrollData = SVSAdRuleData.createPostrollAdRuleData(1, 1200); // Postroll with 1 ad.
 
         // Instantiate a SVSAdRule with preroll, midroll and postroll SVSAdRuleData
         // this SVSAdRule will cover any duration.
