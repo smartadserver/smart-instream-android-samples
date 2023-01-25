@@ -12,8 +12,8 @@ android {
         applicationId "com.smartadserver.android.jwplayersample"
         minSdkVersion 19
         targetSdkVersion 33
-        versionCode 7191
-        versionName "7.19.1"
+        versionCode 7200
+        versionName "7.20.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
     }
@@ -37,7 +37,7 @@ dependencies {
     implementation 'com.longtailvideo.jwplayer:jwplayer-core:3.19.0'
     implementation 'com.longtailvideo.jwplayer:jwplayer-common:3.19.0'
 
-    // force 2.15.1 exoplayer imports (minimum required by Smart Instream SDK 7.18)
+    // force 2.15.1 exoplayer imports (minimum required by Smart Instream SDK)
     implementation('com.google.android.exoplayer:exoplayer-core') { version { strictly '2.15.1' } }
     implementation('com.google.android.exoplayer:exoplayer-ui') { version { strictly '2.15.1' } }
     implementation('com.google.android.exoplayer:exoplayer-dash') { version { strictly '2.15.1' } }
@@ -45,7 +45,7 @@ dependencies {
     implementation('com.google.android.exoplayer:exoplayer-hls') { version { strictly '2.15.1' } }
 
     // Import Smart Instream SDK
-    implementation 'com.smartadserver.android:smart-instream-sdk:7.19.1'
+    implementation 'com.smartadserver.android:smart-instream-sdk:7.20.0'
     
     // to add Huawei support, uncomment the following line
     //implementation 'com.smartadserver.android:smart-core-sdk-huawei-support:1.1.0'
