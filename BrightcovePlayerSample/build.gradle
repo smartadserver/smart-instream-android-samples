@@ -7,7 +7,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.1'
+        classpath 'com.android.tools.build:gradle:7.4.1'
         
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -21,7 +21,7 @@ allprojects {
         mavenCentral()
 
         // Brightcove repository
-        maven { url 'http://repo.brightcove.com/releases' }
+        maven { url 'https://repo.brightcove.com/releases' }
 
         // Smart AdServer repository
         maven { url 'https://packagecloud.io/smartadserver/android/maven2' }
