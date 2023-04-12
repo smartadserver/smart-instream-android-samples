@@ -14,8 +14,8 @@ android {
         applicationId "com.smartadserver.android.jwplayersample"
         minSdkVersion 19
         targetSdkVersion 33
-        versionCode 7202
-        versionName "7.20.2"
+        versionCode 7210
+        versionName "7.21.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
     }
@@ -47,7 +47,7 @@ dependencies {
     implementation('com.google.android.exoplayer:exoplayer-hls') { version { strictly '2.15.1' } }
 
     // Import Smart Instream SDK
-    implementation 'com.smartadserver.android:smart-instream-sdk:7.20.2'
+    implementation 'com.smartadserver.android:smart-instream-sdk:7.21.0'
     
     // to add Huawei support, uncomment the following line
     //implementation 'com.smartadserver.android:smart-core-sdk-huawei-support:1.1.0'
