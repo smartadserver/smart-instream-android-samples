@@ -5,7 +5,7 @@ This repository contains some samples demonstrating how to integrate the _Smart 
 ## Requirements
 
 * A _Smart AdServer_ account
-* _Android Studio 3.0_ or higher
+* _Android Studio
 * _Android 4.4 (API Level 19)_ or higher
 
 ## Installation

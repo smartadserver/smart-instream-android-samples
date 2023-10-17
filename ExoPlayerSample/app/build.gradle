@@ -3,19 +3,21 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    namespace 'com.smartadserver.android.exoplayersample'
+
     defaultConfig {
         applicationId "com.smartadserver.android.exoplayersample"
-        minSdkVersion 19
-        targetSdkVersion 33
-        versionCode 7210
-        versionName "7.21.0"
+        minSdk 19
+        targetSdk 34
+        versionCode 7230
+        versionName "7.23.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
     }
@@ -29,16 +31,14 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     // Import Smart Instream SDK
-    implementation 'com.smartadserver.android:smart-instream-sdk:7.21.0'
+    implementation 'com.smartadserver.android:smart-instream-sdk:7.23.0'
 
     // to add Huawei support, uncomment the following line
-    //implementation 'com.smartadserver.android:smart-core-sdk-huawei-support:1.1.0'
+    //implementation 'com.smartadserver.android:smart-core-sdk-huawei-support:2.0.0'
 }
