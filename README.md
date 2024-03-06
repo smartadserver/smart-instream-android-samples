@@ -6,8 +6,9 @@ This repository contains some samples demonstrating how to integrate the _Smart 
 
 * A _Smart AdServer_ account
 * _Android Studio
-* _Android 4.4 (API Level 19)_ or higher
+* For phone apps, _Android 4.4 (API Level 19)_ or higher
+* For TV apps, _Android 5.0 (API Level 21)_ or higher
 
 ## Installation
 
-For installation and getting started, please check [the complete documentation](http://documentation.smartadserver.com/instreamSDK/).
+For installation and getting started, please check [the complete documentation](https://documentation.smartadserver.com/instreamSDK/).
