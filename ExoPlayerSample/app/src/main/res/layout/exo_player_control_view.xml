@@ -15,13 +15,9 @@
         android:orientation="horizontal"
         android:paddingTop="4dp">
 
-        <ImageButton
-            android:id="@id/exo_play"
-            style="@style/ExoMediaButton.Play" />
-
-        <ImageButton
-            android:id="@id/exo_pause"
-            style="@style/ExoMediaButton.Pause" />
+        <ImageButton android:id="@id/exo_play_pause"
+            android:layout_gravity="center"
+            style="@style/ExoStyledControls.Button.Center.PlayPause"/>
 
         <ImageButton
             android:id="@+id/bt_fullscreen"
@@ -60,7 +56,7 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
-        <com.google.android.exoplayer2.ui.DefaultTimeBar
+        <androidx.media3.ui.DefaultTimeBar
             android:id="@id/exo_progress"
             android:layout_width="0dp"
             android:layout_height="26dp"
@@ -76,7 +72,6 @@
             android:textColor="#FFBEBEBE"
             android:textSize="14sp"
             android:textStyle="bold" />
-
     </LinearLayout>
 
 </LinearLayout>

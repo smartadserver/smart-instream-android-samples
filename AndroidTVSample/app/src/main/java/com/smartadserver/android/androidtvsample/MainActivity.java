@@ -6,20 +6,17 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.Player;
+import androidx.media3.common.util.UnstableApi;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.PlayerView;
+
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.ui.PlayerView;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 import com.smartadserver.android.instreamsdk.admanager.SVSAdManager;
 import com.smartadserver.android.instreamsdk.admanager.SVSCuePoint;
@@ -34,11 +31,11 @@ import com.smartadserver.android.instreamsdk.plugin.SVSExoPlayerPlugin;
 import java.util.List;
 
 /**
- * Simple activity that contains one an instance of {@link com.google.android.exoplayer2.ExoPlayer} as content player
+ * Simple activity that contains one an instance of {@link androidx.media3.exoplayer.ExoPlayer} as content player
  * <p>
  * This sample can be use both on AndroidTV and Amazon FireTV.
  */
-@SuppressWarnings({"DanglingJavadoc", "SpellCheckingInspection"})
+@UnstableApi @SuppressWarnings({"DanglingJavadoc", "SpellCheckingInspection"})
 public class MainActivity extends Activity implements SVSAdManager.UIInteractionListener {
 
     // Constants
@@ -65,7 +62,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
 
     // ExoPlayer related properties
     private PlayerView exoPlayerView;
-    private SimpleExoPlayer simpleExoPlayer;
+    private ExoPlayer simpleExoPlayer;
 
     /**
      * Performs Activity initialization after creation.
@@ -125,7 +122,7 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     }
 
     /**
-     * Overriden to pause both the {@link SVSAdManager} and the {@link com.google.android.exoplayer2.ExoPlayer} along with the Activity.
+     * Overriden to pause both the {@link SVSAdManager} and the {@link ExoPlayer} along with the Activity.
      */
     @Override
     protected void onPause() {
@@ -449,9 +446,9 @@ public class MainActivity extends Activity implements SVSAdManager.UIInteraction
     /**
      * Lazy loaded exoPlayer instance getter.
      */
-    private SimpleExoPlayer getExoPlayer() {
+    private ExoPlayer getExoPlayer() {
         if (simpleExoPlayer == null) {
-            simpleExoPlayer = new SimpleExoPlayer.Builder(this).build();
+            simpleExoPlayer = new ExoPlayer.Builder(this).build();
         }
         return simpleExoPlayer;
     }

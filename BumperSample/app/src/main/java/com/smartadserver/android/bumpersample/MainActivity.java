@@ -19,11 +19,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.Player;
+import androidx.media3.common.util.UnstableApi;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.ui.PlayerView;
 
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.ui.PlayerView;
 import com.smartadserver.android.instreamsdk.SVSContentPlayerPlugin;
 import com.smartadserver.android.instreamsdk.admanager.SVSAdManager;
 import com.smartadserver.android.instreamsdk.admanager.SVSCuePoint;
@@ -40,9 +41,9 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 /**
- * Simple activity that contains one an instance of {@link com.google.android.exoplayer2.ExoPlayer} as content player
+ * Simple activity that contains one an instance of {@link androidx.media3.exoplayer.ExoPlayer} as content player
  */
-public class MainActivity extends AppCompatActivity implements SVSAdManager.UIInteractionListener {
+@UnstableApi public class MainActivity extends AppCompatActivity implements SVSAdManager.UIInteractionListener {
 
     // Constants
 
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
 
     // ExoPlayer related properties
     private PlayerView exoPlayerView;
-    private SimpleExoPlayer simpleExoPlayer;
+    private ExoPlayer simpleExoPlayer;
     private ImageButton fullscreenButton;
     private ImageButton fullscreenExitButton;
 
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     }
 
     /**
-     * Overriden to pause both the {@link SVSAdManager} and the {@link com.google.android.exoplayer2.ExoPlayer} along with the Activity.
+     * Overriden to pause both the {@link SVSAdManager} and the {@link ExoPlayer} along with the Activity.
      */
     @Override
     protected void onPause() {
@@ -517,9 +518,9 @@ public class MainActivity extends AppCompatActivity implements SVSAdManager.UIIn
     /**
      * Lazy loaded exoPlayer instance getter.
      */
-    private SimpleExoPlayer getExoPlayer() {
+    private ExoPlayer getExoPlayer() {
         if (simpleExoPlayer == null) {
-            simpleExoPlayer = new SimpleExoPlayer.Builder(this).build();
+            simpleExoPlayer = new ExoPlayer.Builder(this).build();
         }
         return simpleExoPlayer;
     }
