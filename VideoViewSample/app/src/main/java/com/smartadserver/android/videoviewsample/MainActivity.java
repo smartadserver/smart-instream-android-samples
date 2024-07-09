@@ -19,6 +19,7 @@ import com.smartadserver.android.instreamsdk.admanager.SVSCuePoint;
 import com.smartadserver.android.instreamsdk.adrules.SVSAdRule;
 import com.smartadserver.android.instreamsdk.adrules.SVSAdRuleData;
 import com.smartadserver.android.instreamsdk.model.adbreak.event.SVSAdBreakEvent;
+import com.smartadserver.android.instreamsdk.model.adobjects.SVSAdInfo;
 import com.smartadserver.android.instreamsdk.model.adplacement.SVSAdPlacement;
 import com.smartadserver.android.instreamsdk.model.adplayerconfig.SVSAdPlayerConfiguration;
 import com.smartadserver.android.instreamsdk.model.contentdata.SVSContentData;
@@ -207,6 +208,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAdBreakEvent(@NonNull SVSAdBreakEvent svsAdBreakEvent) {
                 // Called for any event concerning AdBreaks such as Start, Complete, etc.
+            }
+
+            @Override
+            public void onAdStarted(@NonNull SVSAdInfo svsAdInfo) {
+                // Called when an ad has started. Will be called for every ads of an ad break.
             }
 
             @Override

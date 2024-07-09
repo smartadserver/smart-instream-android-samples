@@ -38,7 +38,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 
     // Import Smart Instream SDK
-    implementation 'com.smartadserver.android:smart-instream-sdk:7.25.0'
+    implementation 'com.smartadserver.android:smart-instream-sdk:7.26.0'
 
     // to add Huawei support, uncomment the following line
     //implementation 'com.smartadserver.android:smart-core-sdk-huawei-support:2.0.0'
